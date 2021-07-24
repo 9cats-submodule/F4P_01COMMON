@@ -1,7 +1,7 @@
 #ifndef __DATA_H
 #define __DATA_H
 #include "base.h"
-#include "cmd_process.h"
+#include "cmsis_os2.h"
 
 typedef struct _SVAR
 {

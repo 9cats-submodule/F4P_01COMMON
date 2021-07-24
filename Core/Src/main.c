@@ -20,7 +20,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-#include "dac.h"
 #include "dma.h"
 #include "spi.h"
 #include "tim.h"
@@ -31,18 +30,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "base.h"
-#include "lcd.h"
-#include "text.h"
-#include "touch.h"
 #include "w25qxx.h"
 #include "data.h"
-#include "hmi_user_uart.h"
-#include "hmi_driver.h"
-#include "ADS8688.h"
-#include "AD9959.h"
 #include "output.h"
-#include "arm_math.h"
-#include "arm_const_structs.h"
+#include "24cxx.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,8 +43,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define TP_CHECK(x0,y0,x1,y1) tp_dev.x[0] > x0 && tp_dev.y[0] > y0 && tp_dev.x[0] < x1 && tp_dev.y[0] < y1
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -86,7 +75,7 @@ void MX_FREERTOS_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	u8 temp;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -112,20 +101,25 @@ int main(void)
   MX_SPI1_Init();
   MX_USART1_UART_Init();
   MX_SPI3_Init();
-  MX_DAC_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-  W25QXX_Init();
+  AT24CXX_Init(); //AT24C02-EEPROM-初始化
+  W25QXX_Init();  //W24Q128-FLASH -初始化
   //LCD_Init();
   //font_init();
   //tp_dev.init();
-  TFT_Init(&RxBuffer);
-  DATA_INIT();
+  //TFT_Init(&RxBuffer);
+  //DATA_INIT();
   //Init_AD9959();
   //Out_freq(2, 10);
   //Out_mV(2, 300);
-  HAL_TIM_Base_Start(&htim1);
+  //HAL_TIM_Base_Start(&htim1);
+  //temp = 128;
+  //AT24CXX_Write(0x20,&temp, 1);
+  //temp = 0;
+  //AT24CXX_Read(0x20, &temp, 1);
 
+  for(;;);
   /* USER CODE END 2 */
 
   /* Init scheduler */

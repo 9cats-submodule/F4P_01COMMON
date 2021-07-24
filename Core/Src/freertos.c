@@ -159,7 +159,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the queue(s) */
   /* creation of USART1_RX */
-  USART1_RXHandle = osMessageQueueNew (5, sizeof(CMD_MAX_SIZE), &USART1_RX_attributes);
+//  USART1_RXHandle = osMessageQueueNew (5, sizeof(CMD_MAX_SIZE), &USART1_RX_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */

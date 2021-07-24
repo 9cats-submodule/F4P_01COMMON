@@ -10,17 +10,13 @@
 #define s16 int16_t
 #define s8 int8_t
 
-#include "stdlib.h"
-#include "stdio.h"
-#include "stm32f4xx.h"
-#include "stm32f4xx_hal.h"
 #include "gpio.h"
 #include "usart.h"
-#include "cmsis_os.h"
-#include "queue.h"
-#include "semphr.h"
 #include "data.h"
 #include "output.h"
+#include "w25qxx.h"
+#include "arm_math.h"
+#include "arm_const_structs.h"
 
 #define ON  1
 #define OFF 0
@@ -36,27 +32,14 @@
 #define LED1_T (HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin))
 #define LED1_ON LED1(0)
 #define LED1_OFF LED1(1)
-#define LED2(n) (n?HAL_GPIO_WritePin(LED2_GPIO_Port,LED2_Pin,GPIO_PIN_SET):HAL_GPIO_WritePin(LED2_GPIO_Port,LED2_Pin,GPIO_PIN_RESET))
-#define LED2_T (HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin))
-#define LED2_ON LED2(0)
-#define LED2_OFF LED2(1)
 
 // 按键部分常用
 // 不使用时注释
 #define KEY0 HAL_GPIO_ReadPin(KEY0_GPIO_Port,KEY0_Pin)//读取按键0
 #define KEY1 HAL_GPIO_ReadPin(KEY1_GPIO_Port,KEY1_Pin)//读取按键1
-#define KEY2 HAL_GPIO_ReadPin(KEY2_GPIO_Port,KEY2_Pin)//读取按键2
 #define KEY0_PRES 1
 #define KEY1_PRES 2
-#define KEY2_PRES 3
 u8 KEY_Scan(u8 mode); //按键扫描函数
-
-// 自定义delay函数，兼容部分硬件库
-void delay_init(u8 SYSCLK);
-void delay_ms(u16 nms);
-void delay_us(u32 nus);
-void delay_ns (u8 t);
-
 
 //IO?地址映射
 #define BITBAND(addr, bitnum) ((addr & 0xF0000000)+0x2000000+((addr&0xFFFFF)<<5)+(bitnum<<2))
@@ -84,30 +67,30 @@ void delay_ns (u8 t);
 #define GPIOI_IDR_Addr (GPIOI_BASE+16) //0x40022010
 #define GPIOJ_IDR_Addr (GPIOJ_BASE+16) //0x40022410
 #define GPIOK_IDR_Addr (GPIOK_BASE+16) //0x40022810
-//IO?操作,只对单?的IO?
+//IO输入输出操作,只对单个的IO
 //确保n的值?于16
 #define PAout(n) BIT_ADDR(GPIOA_ODR_Addr,n) //输出
-#define PAin(n) BIT_ADDR(GPIOA_IDR_Addr,n) //输?
+#define PAin(n) BIT_ADDR(GPIOA_IDR_Addr,n) //输入
 #define PBout(n) BIT_ADDR(GPIOB_ODR_Addr,n) //输出
-#define PBin(n) BIT_ADDR(GPIOB_IDR_Addr,n) //输?
+#define PBin(n) BIT_ADDR(GPIOB_IDR_Addr,n) //输入
 #define PCout(n) BIT_ADDR(GPIOC_ODR_Addr,n) //输出
-#define PCin(n) BIT_ADDR(GPIOC_IDR_Addr,n) //输?
+#define PCin(n) BIT_ADDR(GPIOC_IDR_Addr,n) //输入
 #define PDout(n) BIT_ADDR(GPIOD_ODR_Addr,n) //输出
-#define PDin(n) BIT_ADDR(GPIOD_IDR_Addr,n) //输?
+#define PDin(n) BIT_ADDR(GPIOD_IDR_Addr,n) //输入
 #define PEout(n) BIT_ADDR(GPIOE_ODR_Addr,n) //输出
-#define PEin(n) BIT_ADDR(GPIOE_IDR_Addr,n) //输?
+#define PEin(n) BIT_ADDR(GPIOE_IDR_Addr,n) //输入
 #define PFout(n) BIT_ADDR(GPIOF_ODR_Addr,n) //输出
-#define PFin(n) BIT_ADDR(GPIOF_IDR_Addr,n) //输?
+#define PFin(n) BIT_ADDR(GPIOF_IDR_Addr,n) //输入
 #define PGout(n) BIT_ADDR(GPIOG_ODR_Addr,n) //输出
-#define PGin(n) BIT_ADDR(GPIOG_IDR_Addr,n) //输?
+#define PGin(n) BIT_ADDR(GPIOG_IDR_Addr,n) //输入
 #define PHout(n) BIT_ADDR(GPIOH_ODR_Addr,n) //输出
-#define PHin(n) BIT_ADDR(GPIOH_IDR_Addr,n) //输?
+#define PHin(n) BIT_ADDR(GPIOH_IDR_Addr,n) //输入
 #define PIout(n) BIT_ADDR(GPIOI_ODR_Addr,n) //输出
-#define PIin(n) BIT_ADDR(GPIOI_IDR_Addr,n) //输?
+#define PIin(n) BIT_ADDR(GPIOI_IDR_Addr,n) //输入
 #define PJout(n) BIT_ADDR(GPIOJ_ODR_Addr,n) //输出
-#define PJin(n) BIT_ADDR(GPIOJ_IDR_Addr,n) //输?
+#define PJin(n) BIT_ADDR(GPIOJ_IDR_Addr,n) //输入
 #define PKout(n) BIT_ADDR(GPIOK_ODR_Addr,n) //输出
-#define PKin(n) BIT_ADDR(GPIOK_IDR_Addr,n) //输?
+#define PKin(n) BIT_ADDR(GPIOK_IDR_Addr,n) //输入
 
 /*!
  *  \brief 数据初始化，若按下KEY0则恢复默认

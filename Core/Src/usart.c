@@ -21,14 +21,7 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-#include "cmd_queue.h"
-#include "cmd_process.h"
 
-#define CMD_HEAD 0XEE  //帧头
-#define CMD_TAIL 0XFFFCFFFF //帧尾
-
-u8 receiveStatus=0;
-u8 IPD=0; //目标客户端号
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
