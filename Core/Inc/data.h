@@ -2,6 +2,7 @@
 #define __DATA_H
 #include "base.h"
 #include "cmsis_os2.h"
+#include "FreeRTOSConfig.h"
 
 extern u8 MEM_CCMRAM[][1024];
 
@@ -39,5 +40,4 @@ extern float FIR_STATE[];
 
 //------以下基本不用动-------
 extern u8 RxBuffer; //USART1接收BUF
-extern u8 ucHeap[];
 #endif

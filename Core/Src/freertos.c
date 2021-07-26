@@ -108,7 +108,13 @@ const osSemaphoreAttr_t TFT_TX_LED_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-
+//// FreeRTOS ¶ÑÕ»Çø
+//_CCM u8 ucHeap[configTOTAL_HEAP_SIZE];
+//const HeapRegion_t xHeapRegions[] =
+//{
+//    { ucHeap, configTOTAL_HEAP_SIZE },
+//    { NULL, 0 }
+//};
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);

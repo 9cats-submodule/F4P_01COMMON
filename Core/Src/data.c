@@ -1,5 +1,4 @@
 #include "data.h"
-#include "FreeRTOSConfig.h"
 
 typedef struct HeapRegion
 {

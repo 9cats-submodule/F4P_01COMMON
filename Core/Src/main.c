@@ -25,7 +25,6 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "fsmc.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -36,6 +35,7 @@
 #include "output.h"
 #include "portmacro.h"
 #include "hmi_user_uart.h"
+#include "AD9959.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -77,7 +77,7 @@ void MX_FREERTOS_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	extern u8 ucHeap[];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -99,7 +99,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_FSMC_Init();
   MX_SPI1_Init();
   MX_USART1_UART_Init();
   MX_SPI3_Init();
@@ -108,28 +107,17 @@ int main(void)
   /* USER CODE BEGIN 2 */
   AT24CXX_Init();      //AT24C02-EEPROM-初始化
   W25QXX_Init();       //W24Q128-FLASH -初始化
+  Init_AD9959();       //AD9959-DDS    -初始化
   TFT_Init(&RxBuffer); //TFT-串口屏    -初始化
   ucHeap[0] = 0;       //显示出 ucHeap 在 CCMRAM 的占用
-
-  //MEM_CCMRAM[0][0] = 233;
-  //MEM_EXSRAM[0][0] = 233;
-  //LCD_Init();
-  //font_init();
-  //tp_dev.init();
-  //TFT_Init(&RxBuffer);
-  //DATA_INIT();
-  //Init_AD9959();
-  //Out_freq(2, 10);
-  //Out_mV(2, 300);
-  //HAL_TIM_Base_Start(&htim1);
-  //temp = 128;
-  //AT24CXX_Write(0x20,&temp, 1);
-  //temp = 0;
-  //AT24CXX_Read(0x20, &temp, 1);
-  //temp = 128;
-  //W25QXX_Write(&temp,0x10, 1);
-  //temp = 0;
-  //W25QXX_Read(&temp, 0x10, 1);
+  Out_freq(0, 1000);
+  Out_mV(0, 300);
+  Out_freq(1, 1000);
+  Out_mV(1, 300);
+  Out_freq(2, 1000);
+  Out_mV(2, 300);
+  Out_freq(3, 1000);
+  Out_mV(3, 300);
 
 
   /* USER CODE END 2 */

@@ -46,12 +46,19 @@ void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
-  __HAL_RCC_GPIOG_CLK_ENABLE();
-  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, AD9959_GND_Pin|AD9959_P0_Pin|AD9959_PWR_Pin|AD9959_P1_Pin
+                          |AD9959_REST_Pin|AD9959_P2_Pin|AD9959_IOUP_Pin|AD9959_P3_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOG, AD9959_CS_Pin|AD9959_SD0_Pin|AD9959_SCLK_Pin|AD9959_SD1_Pin
+                          |AD9959_SD3_Pin|AD9959_SD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, W25QXX_CS_Pin|LED0_Pin|LED1_Pin, GPIO_PIN_SET);
@@ -70,6 +77,24 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PDPin PDPin PDPin PDPin
+                           PDPin PDPin PDPin PDPin */
+  GPIO_InitStruct.Pin = AD9959_GND_Pin|AD9959_P0_Pin|AD9959_PWR_Pin|AD9959_P1_Pin
+                          |AD9959_REST_Pin|AD9959_P2_Pin|AD9959_IOUP_Pin|AD9959_P3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PGPin PGPin PGPin PGPin
+                           PGPin PGPin */
+  GPIO_InitStruct.Pin = AD9959_CS_Pin|AD9959_SD0_Pin|AD9959_SCLK_Pin|AD9959_SD1_Pin
+                          |AD9959_SD3_Pin|AD9959_SD2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PGPin PGPin PGPin */
   GPIO_InitStruct.Pin = W25QXX_CS_Pin|LED0_Pin|LED1_Pin;
