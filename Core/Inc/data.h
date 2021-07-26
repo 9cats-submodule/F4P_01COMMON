@@ -4,7 +4,6 @@
 #include "cmsis_os2.h"
 
 extern u8 MEM_CCMRAM[][1024];
-extern u8 MEM_EXSRAM[][1024];
 
 typedef struct _SVAR
 {

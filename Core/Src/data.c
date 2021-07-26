@@ -7,7 +7,6 @@ typedef struct HeapRegion
 	size_t xSizeInBytes;
 } HeapRegion_t;
 //_CCM u8 MEM_CCMRAM[48 ][1024] = {0};
-_EXR u8 MEM_EXSRAM[200][1024] = {0};
 
 //ø…¥¢¥Ê±‰¡ø
 SVAR Svar = {

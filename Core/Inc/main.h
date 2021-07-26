@@ -103,7 +103,6 @@ void FaultChecK(void);
 #define AT24CXX_SDA_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define _CCM __attribute__((section(".ccmram")))
-#define _EXR __attribute__((section(".ex_sram")))
 #define _RAM __attribute__((section(".RamFunc")))
 /* USER CODE END Private defines */
 

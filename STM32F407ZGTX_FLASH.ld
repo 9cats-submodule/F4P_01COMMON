@@ -39,7 +39,6 @@ MEMORY
 {
   CCMRAM    (xrw)    : ORIGIN = 0x10000000,   LENGTH = 64K
   FLASH     (rx)     : ORIGIN = 0x8000000 ,   LENGTH = 1024K
-  EXSRAM    (xrw)    : ORIGIN = 0x68000000,   LENGTH = 1024K
   RAM       (xrw)    : ORIGIN = 0x20000000,   LENGTH = 128K
 }
 
@@ -167,18 +166,7 @@ SECTIONS
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
   } > CCMRAM
-  
-    /* EX_SRAM */
-  .ex_sram :
-  {
-    . = ALIGN(4);
-    __EX_SRAM_SYMBOLS = .;  /* create a global symbol at ccmram start */
-    *(.ex_sram)
-    *(.ex_sram*)
-    . = ALIGN(4);
-    __EEX_SRAM_SYMBOLS = .;  /* create a global symbol at ccmram end */
-  } > EXSRAM AT> FLASH
-  
+
   /*--- New CCMRAM linker section definition ---*/
   _siccmram = LOADADDR(.ccmram);
   /* CCMRAM section */
