@@ -1,23 +1,28 @@
-//#include "main.h"
+#include "main.h"
+#include "ADS8688.h"
+#include "spi.h"
+#include "hmi_driver.h"
 //#include "cmsis_os.h"
 //#include "arm_math.h"
 //#include "arm_const_structs.h"
 //#include "fdacoefs.h"
+
+#define SAMPLE_BEGIN HAL_GPIO_WritePin(ADS8688_CS_GPIO_Port, ADS8688_CS_Pin, GPIO_PIN_RESET);
+#define SAMPLE_END   HAL_GPIO_WritePin(ADS8688_CS_GPIO_Port, ADS8688_CS_Pin, GPIO_PIN_SET);
 //
 ///*!
 // *  \brief  TIM1 配置 PRC, ARR
 // *  \param  PRC 预分配系数
 // *  \param  ARR 自动重装载值
-// *  \
 // */
-//void TIM1_CONFIG(u32 PRC,u32 ARR)
-//{
-//	__HAL_TIM_DISABLE(&htim1);
-//	__HAL_TIM_SET_PRESCALER(  &htim1, PRC);
-//	__HAL_TIM_SET_AUTORELOAD( &htim1, ARR);
-//	__HAL_TIM_SET_COUNTER(    &htim1,   0);
-//	__HAL_TIM_ENABLE(&htim1);
-//}
+void TIM1_CONFIG(u32 PRC,u32 ARR)
+{
+	__HAL_TIM_DISABLE(&htim1);
+	__HAL_TIM_SET_PRESCALER(  &htim1, PRC);
+	__HAL_TIM_SET_AUTORELOAD( &htim1, ARR);
+	__HAL_TIM_SET_COUNTER(    &htim1,   0);
+	__HAL_TIM_ENABLE(&htim1);
+}
 //
 ///*!
 // *  \brief  ADS8688 多通道 动态配置
@@ -25,16 +30,16 @@
 // *  \param  range 通道范围
 // *  \warn!  初始化后120ms左右内采样值不精确
 // */
-//void ADS8688_MUL_CONFIG(u8 CH,u8 range)
-//{
-//	CH_NUM = 0;
-//	ADS8688_CONFIG(CH,0x01);
-//	while(CH)
-//	{
-//		CH_NUM += CH & 0x01;
-//		CH >>= 1;
-//	}
-//}
+void ADS8688_MUL_CONFIG(u8 CH,u8 range)
+{
+	CH_NUM = 0;
+	ADS8688_CONFIG(CH,range);
+	while(CH)
+	{
+		CH_NUM += CH & 0x01;
+		CH >>= 1;
+	}
+}
 //
 ///*!
 // *  \brief  AD9959 动态配置
@@ -53,17 +58,15 @@
 // *  \brief  开启 TIM1 定时采样一定点数
 // *  \param  point 每个通道的采样点数
 // */
-//void ADS8688_SAMPLE(u16 point)
-//{
-//	SAMPLE_POINT = CH_NUM * point;
-//	__HAL_TIM_SET_COUNTER( &htim1, 0);
-//	__HAL_TIM_ENABLE_IT(   &htim1, TIM_IT_UPDATE);
-//	while(SAMPLE_FINISHED == NO)
-//		osDelay(1);
-//	SAMPLE_FINISHED = NO;
-////	while(osSemaphoreAcquire(SAMPLE_FINISHEDHandle, 0) != osOK)
-////		osDelay(1);
-//}
+void ADS8688_SAMPLE(u16 point)
+{
+	SAMPLE_POINT = CH_NUM * point;
+	__HAL_TIM_SET_COUNTER( &htim1, 0);
+	__HAL_TIM_ENABLE_IT(   &htim1, TIM_IT_UPDATE);
+	while(SAMPLE_FINISHED == NO)
+		osDelay(1);
+	SAMPLE_FINISHED = NO;
+}
 //
 ///*!
 // *  \brief    FFT变换
@@ -133,77 +136,16 @@
 ///*!
 // *  \brief  主任务
 // */
-//void MainTask_Start(void const *argument) {
-//	TIM1_CONFIG(25-1,210-1);						//采样率 32K
-//	ADS8688_MUL_CONFIG(0b00000100,2);		//ADS 3通道开启，±5.12 V
-////	AD9959_CONFIG(1000,300);						//DDS 3通道开启，1KHZ，300mV
-//
-//	osDelay(300);
-//
-//	for(;;){
-//		ADS8688_SAMPLE(2248);
-//		FFT(0);
-//		FIR(0,2048);
-//
-//		//波形显示
-//		{
-//			u16 i=0,j=0;
-//			u8 raiseTime=0,fallTime=0;
-//			u8 DATA_SHOW[512];
-//			//先得到上升沿
-//			for(i=200;i<500;i++)
-//			{
-//				if(FIR_OUTPUT[i] > FIR_OUTPUT[i-1])raiseTime++;
-//				else raiseTime = 0;
-//				if(raiseTime == 3)break;
-//			}
-//			//在下降点触发
-//			for(;i<500;i++)
-//			{
-//				if(FIR_OUTPUT[i] < FIR_OUTPUT[i-1])fallTime++;
-//				else fallTime=0;
-//				if(fallTime == 3)break;
-//			}
-//
-//			for(j=0;j<256;j++)
-//			{
-//				DATA_SHOW[j] = FIR_INPUT[i+j]*128/5 + 128;
-//			}
-//
-//			GraphChannelDataAdd(1,7,1,DATA_SHOW,256);
-//		}
-//		//失真度显示
-//		{
-//			SetTextValue(1, 41, Str("%.2f%%",THD(64)*100));
-//		}
-//
-//		osDelay(1000);
-//	}
-//}
-//
-//
-////		FFT(0);
-////		{
-////			u16 i;
-////			for(i=0;i<2048;i++)
-////			{
-////				OutData[0] = (float)ADS8688_BUF[0][i] - Svar.ADS_OFFSET_ALL;
-////				OutData[1] = FFT_INPUT[i];
-////				OutData[2] = FFT_OUTPUT[i];
-////				OutData[3] = i<1024?FFT_OUTPUT_REAL[i]:0;
-////				OutPut_Data();
-////				osDelay(1);
-////			}
-////		}
-//
-////		FIR(0,2048);
-////		{
-////			u16 i;
-////			for(i=0;i<2048;i++)
-////			{
-////				OutData[0] = FIR_INPUT[i]*4000;
-////				OutData[1] = FIR_OUTPUT[i]*4000;
-////				OutPut_Data();
-////				osDelay(1);
-////			}
-////		}
+
+void MainTask_Start(void *argument)
+{
+  /* Infinite loop */
+	TIM1_CONFIG(25-1,210-1);						//采样率 32K
+	ADS8688_MUL_CONFIG(0b00000100,2);		//ADS 3通道开启，±5.12 V
+	osDelay(300);
+
+	for(;;){
+		SetTextValue(1, 41, (u8*)"233");
+		osDelay(1000);
+	}
+}

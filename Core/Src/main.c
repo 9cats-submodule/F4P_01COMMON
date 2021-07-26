@@ -30,10 +30,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "base.h"
-#include "w25qxx.h"
 #include "data.h"
-#include "output.h"
+#include "w25qxx.h"
 #include "24cxx.h"
+#include "output.h"
+#include "portmacro.h"
+#include "hmi_user_uart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -75,7 +77,7 @@ void MX_FREERTOS_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	u8 temp;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -102,9 +104,15 @@ int main(void)
   MX_USART1_UART_Init();
   MX_SPI3_Init();
   MX_TIM1_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
-  AT24CXX_Init(); //AT24C02-EEPROM-初始化
-  W25QXX_Init();  //W24Q128-FLASH -初始化
+  AT24CXX_Init();      //AT24C02-EEPROM-初始化
+  W25QXX_Init();       //W24Q128-FLASH -初始化
+  TFT_Init(&RxBuffer); //TFT-串口屏    -初始化
+  ucHeap[0] = 0;       //显示出 ucHeap 在 CCMRAM 的占用
+
+  //MEM_CCMRAM[0][0] = 233;
+  //MEM_EXSRAM[0][0] = 233;
   //LCD_Init();
   //font_init();
   //tp_dev.init();
@@ -118,8 +126,12 @@ int main(void)
   //AT24CXX_Write(0x20,&temp, 1);
   //temp = 0;
   //AT24CXX_Read(0x20, &temp, 1);
+  //temp = 128;
+  //W25QXX_Write(&temp,0x10, 1);
+  //temp = 0;
+  //W25QXX_Read(&temp, 0x10, 1);
 
-  for(;;);
+
   /* USER CODE END 2 */
 
   /* Init scheduler */

@@ -1,4 +1,13 @@
 #include "data.h"
+#include "FreeRTOSConfig.h"
+
+typedef struct HeapRegion
+{
+	uint8_t *pucStartAddress;
+	size_t xSizeInBytes;
+} HeapRegion_t;
+//_CCM u8 MEM_CCMRAM[48 ][1024] = {0};
+_EXR u8 MEM_EXSRAM[200][1024] = {0};
 
 //可储存变量
 SVAR Svar = {
@@ -26,3 +35,11 @@ float FIR_STATE[200]      ={0};
 
 //------以下基本不用动-------
 u8 RxBuffer; //USART1接收BUF
+
+// FreeRTOS 堆栈区
+_CCM u8 ucHeap[configTOTAL_HEAP_SIZE];
+const HeapRegion_t xHeapRegions[] =
+{
+    { ucHeap, configTOTAL_HEAP_SIZE },
+    { NULL, 0 }
+};

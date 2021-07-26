@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "cmd_process.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -83,13 +83,6 @@ const osThreadAttr_t FLASH_Data_Auto_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for LED2_Toggle */
-osThreadId_t LED2_ToggleHandle;
-const osThreadAttr_t LED2_Toggle_attributes = {
-  .name = "LED2_Toggle",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityRealtime,
-};
 /* Definitions for MainTask */
 osThreadId_t MainTaskHandle;
 const osThreadAttr_t MainTask_attributes = {
@@ -97,10 +90,10 @@ const osThreadAttr_t MainTask_attributes = {
   .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityAboveNormal7,
 };
-/* Definitions for USART1_RX */
-osMessageQueueId_t USART1_RXHandle;
-const osMessageQueueAttr_t USART1_RX_attributes = {
-  .name = "USART1_RX"
+/* Definitions for USART6_RX */
+osMessageQueueId_t USART6_RXHandle;
+const osMessageQueueAttr_t USART6_RX_attributes = {
+  .name = "USART6_RX"
 };
 /* Definitions for TFT_RX_LED */
 osSemaphoreId_t TFT_RX_LEDHandle;
@@ -123,7 +116,6 @@ void StartLED0Toggle(void *argument);
 void StartLED1Toggle(void *argument);
 void TFT_CMD_Process_Start(void *argument);
 void FLASH_Data_AutoUpdate_Start(void *argument);
-void StartLED2Toggle(void *argument);
 void MainTask_Start(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -158,8 +150,8 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_TIMERS */
 
   /* Create the queue(s) */
-  /* creation of USART1_RX */
-//  USART1_RXHandle = osMessageQueueNew (5, sizeof(CMD_MAX_SIZE), &USART1_RX_attributes);
+  /* creation of USART6_RX */
+  USART6_RXHandle = osMessageQueueNew (5, sizeof(CTRL_MSG), &USART6_RX_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -180,9 +172,6 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of FLASH_Data_Auto */
   FLASH_Data_AutoHandle = osThreadNew(FLASH_Data_AutoUpdate_Start, NULL, &FLASH_Data_Auto_attributes);
-
-  /* creation of LED2_Toggle */
-  LED2_ToggleHandle = osThreadNew(StartLED2Toggle, NULL, &LED2_Toggle_attributes);
 
   /* creation of MainTask */
   MainTaskHandle = osThreadNew(MainTask_Start, NULL, &MainTask_attributes);
@@ -285,24 +274,6 @@ __weak void FLASH_Data_AutoUpdate_Start(void *argument)
     osDelay(1);
   }
   /* USER CODE END FLASH_Data_AutoUpdate_Start */
-}
-
-/* USER CODE BEGIN Header_StartLED2Toggle */
-/**
-* @brief Function implementing the LED2_Toggle thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartLED2Toggle */
-__weak void StartLED2Toggle(void *argument)
-{
-  /* USER CODE BEGIN StartLED2Toggle */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END StartLED2Toggle */
 }
 
 /* USER CODE BEGIN Header_MainTask_Start */

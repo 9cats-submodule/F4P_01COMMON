@@ -29,7 +29,7 @@
 ENTRY(Reset_Handler)
 
 /* Highest address of the user mode stack */
-_estack = ORIGIN(RAM) + LENGTH(RAM);	/* end of "RAM" Ram type memory */
+_estack = ORIGIN(CCMRAM) + LENGTH(CCMRAM);	/* end of "RAM" Ram type memory */
 
 _Min_Heap_Size = 0x200 ;	/* required amount of heap  */
 _Min_Stack_Size = 0x400 ;	/* required amount of stack */
@@ -38,8 +38,9 @@ _Min_Stack_Size = 0x400 ;	/* required amount of stack */
 MEMORY
 {
   CCMRAM    (xrw)    : ORIGIN = 0x10000000,   LENGTH = 64K
-  RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 128K
-  FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 1024K
+  FLASH     (rx)     : ORIGIN = 0x8000000 ,   LENGTH = 1024K
+  EXSRAM    (xrw)    : ORIGIN = 0x68000000,   LENGTH = 1024K
+  RAM       (xrw)    : ORIGIN = 0x20000000,   LENGTH = 128K
 }
 
 /* Sections */
@@ -165,8 +166,33 @@ SECTIONS
     . = . + _Min_Heap_Size;
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
-  } >RAM
-
+  } > CCMRAM
+  
+    /* EX_SRAM */
+  .ex_sram :
+  {
+    . = ALIGN(4);
+    __EX_SRAM_SYMBOLS = .;  /* create a global symbol at ccmram start */
+    *(.ex_sram)
+    *(.ex_sram*)
+    . = ALIGN(4);
+    __EEX_SRAM_SYMBOLS = .;  /* create a global symbol at ccmram end */
+  } > EXSRAM AT> FLASH
+  
+  /*--- New CCMRAM linker section definition ---*/
+  _siccmram = LOADADDR(.ccmram);
+  /* CCMRAM section */
+  .ccmram :
+  {
+  . = ALIGN(4);
+  _sccmram = .; /* define a global symbols at ccmram start */
+  *(.ccmram)
+  *(.ccmram*)
+  . = ALIGN(4);
+  _eccmram = .; /* define a global symbols at ccmram end */
+  } >CCMRAM AT> FLASH
+  /*--- End of CCMRAM linker section definition ---*/
+  
   /* Remove information from the compiler libraries */
   /DISCARD/ :
   {

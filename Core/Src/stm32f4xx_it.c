@@ -26,6 +26,9 @@
 #include "usart.h"
 #include "spi.h"
 #include "cmsis_os.h"
+#include "ADS8688.h"
+#include "cmd_process.h"
+#include "cmd_queue.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -72,6 +75,7 @@ extern DMA_HandleTypeDef hdma_spi3_rx;
 extern DMA_HandleTypeDef hdma_spi3_tx;
 extern TIM_HandleTypeDef htim1;
 extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart6;
 extern TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN EV */
@@ -183,9 +187,11 @@ void DebugMon_Handler(void)
 void DMA1_Stream0_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
+  ADS8688_BUSY = 0;
   /* USER CODE END DMA1_Stream0_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_spi3_rx);
   /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
+  SAMPLE_END;    //拉高CS
   /* USER CODE END DMA1_Stream0_IRQn 1 */
 }
 
@@ -209,9 +215,41 @@ void DMA1_Stream5_IRQHandler(void)
 void TIM1_UP_TIM10_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 0 */
+  static u16 i=0;
+  static u8  IS_FIRST = 1; //是否第一次进入中断 （第一次进入中断无法获取到值）
   /* USER CODE END TIM1_UP_TIM10_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 1 */
+  if(!ADS8688_BUSY)
+  {
+    //开启下一次扫描
+    ADS8688_BUSY = 1;
+    SAMPLE_BEGIN;  //重新拉低CS，ADS8688开始运输
+  	if(IS_FIRST == YES)
+  	{
+  		HAL_SPI_TransmitReceive_DMA(&hspi3, txbuf, rxbuf, 2);
+  		IS_FIRST = NO;
+  	}
+  	else
+  	{
+  		ADS8688_BUF[i%CH_NUM][i/CH_NUM] = *(u16*)(&rxbuf[2]); //将采样值储存在BUF中
+  		HAL_SPI_TransmitReceive_DMA(&hspi3, txbuf, rxbuf, 2);
+
+  		if(++i == SAMPLE_POINT)
+  		{
+  			//定时器任务结束
+  			i=0;
+  			SAMPLE_FINISHED = IS_FIRST = YES;
+  			__HAL_TIM_DISABLE_IT(&htim1, TIM_IT_UPDATE);
+
+  		}
+  	}
+  }
+  else
+  {
+	//正常情况无法到此处
+    ADS8688_BUSY = ADS8688_BUSY;
+  }
   /* USER CODE END TIM1_UP_TIM10_IRQn 1 */
 }
 
@@ -243,20 +281,33 @@ void USART1_IRQHandler(void)
   /* USER CODE END USART1_IRQn 1 */
 }
 
+/**
+  * @brief This function handles USART6 global interrupt.
+  */
+void USART6_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART6_IRQn 0 */
+
+  /* USER CODE END USART6_IRQn 0 */
+  HAL_UART_IRQHandler(&huart6);
+  /* USER CODE BEGIN USART6_IRQn 1 */
+
+  /* USER CODE END USART6_IRQn 1 */
+}
+
 /* USER CODE BEGIN 1 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if (huart->Instance == USART1)
+	if (huart->Instance == USART6)
 	{
-//		huart1.RxState = HAL_UART_STATE_READY;
-//		__HAL_UNLOCK(&huart1);
-//		queue_push(RxBuffer);
-//		if(queue_find_cmd(cmd_buffer,CMD_MAX_SIZE))
-//		{
-//			osMessageQueuePut(USART1_RXHandle,cmd_buffer,0,0);
-//		}
-//		HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
-//	}
+		huart6.RxState = HAL_UART_STATE_READY;
+		__HAL_UNLOCK(&huart6);
+		queue_push(RxBuffer);
+		if(queue_find_cmd(cmd_buffer,CMD_MAX_SIZE))
+		{
+			osMessageQueuePut(USART6_RXHandle,cmd_buffer,0,0);
+		}
+		HAL_UART_Receive_IT(&huart6, &RxBuffer, 1);
 	}
 }
 /* USER CODE END 1 */

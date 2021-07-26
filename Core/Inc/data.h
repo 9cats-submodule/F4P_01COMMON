@@ -3,6 +3,9 @@
 #include "base.h"
 #include "cmsis_os2.h"
 
+extern u8 MEM_CCMRAM[][1024];
+extern u8 MEM_EXSRAM[][1024];
+
 typedef struct _SVAR
 {
   float ADS_AMP;        //所有ADS倍数补偿
@@ -15,7 +18,7 @@ extern u8 MODE;   //当前模式
 extern u8 CH_NUM; //所选通道总数
 
 //FreeRTOS--任务信息量句柄
-extern osMessageQueueId_t USART1_RXHandle;
+extern osMessageQueueId_t USART6_RXHandle;
 extern osSemaphoreId_t    TFT_TX_LEDHandle;
 extern osSemaphoreId_t    TFT_RX_LEDHandle;
 // ADS8688 采样完成信号量
@@ -37,4 +40,5 @@ extern float FIR_STATE[];
 
 //------以下基本不用动-------
 extern u8 RxBuffer; //USART1接收BUF
+extern u8 ucHeap[];
 #endif

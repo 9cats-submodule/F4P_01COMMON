@@ -67,10 +67,14 @@ void FaultChecK(void);
 #define KEY1_GPIO_Port GPIOF
 #define W25QXX_CS_Pin GPIO_PIN_8
 #define W25QXX_CS_GPIO_Port GPIOG
-#define TFT_UART_TX_Pin GPIO_PIN_9
-#define TFT_UART_TX_GPIO_Port GPIOA
-#define TFT_UART_RX_Pin GPIO_PIN_10
-#define TFT_UART_RX_GPIO_Port GPIOA
+#define TFT_USART_TX_Pin GPIO_PIN_6
+#define TFT_USART_TX_GPIO_Port GPIOC
+#define TFT_USART_RX_Pin GPIO_PIN_7
+#define TFT_USART_RX_GPIO_Port GPIOC
+#define DEBUG_USART_TX_Pin GPIO_PIN_9
+#define DEBUG_USART_TX_GPIO_Port GPIOA
+#define DEBUG_USART_RX_Pin GPIO_PIN_10
+#define DEBUG_USART_RX_GPIO_Port GPIOA
 #define ADS8688_CS_Pin GPIO_PIN_15
 #define ADS8688_CS_GPIO_Port GPIOA
 #define ADS8688_SCK_Pin GPIO_PIN_10
@@ -79,6 +83,10 @@ void FaultChecK(void);
 #define ADS8688_MISO_GPIO_Port GPIOC
 #define ADS8688_MOSI_Pin GPIO_PIN_12
 #define ADS8688_MOSI_GPIO_Port GPIOC
+#define ADS8688_DAISY_Pin GPIO_PIN_2
+#define ADS8688_DAISY_GPIO_Port GPIOD
+#define ADS8688_RST_Pin GPIO_PIN_3
+#define ADS8688_RST_GPIO_Port GPIOD
 #define LED0_Pin GPIO_PIN_13
 #define LED0_GPIO_Port GPIOG
 #define LED1_Pin GPIO_PIN_14
@@ -94,7 +102,9 @@ void FaultChecK(void);
 #define AT24CXX_SDA_Pin GPIO_PIN_9
 #define AT24CXX_SDA_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-
+#define _CCM __attribute__((section(".ccmram")))
+#define _EXR __attribute__((section(".ex_sram")))
+#define _RAM __attribute__((section(".RamFunc")))
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

@@ -10,6 +10,7 @@
 #define s16 int16_t
 #define s8 int8_t
 
+#include "main.h"
 #include "gpio.h"
 #include "usart.h"
 #include "data.h"
