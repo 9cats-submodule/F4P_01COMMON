@@ -1,15 +1,11 @@
 #include "main.h"
 #include "ADS8688.h"
-#include "spi.h"
+#include "AD9959.h"
 #include "hmi_driver.h"
-//#include "cmsis_os.h"
-//#include "arm_math.h"
-//#include "arm_const_structs.h"
-//#include "fdacoefs.h"
+#include "arm_math.h"
+#include "arm_const_structs.h"
+#include "fdacoefs.h"
 
-#define SAMPLE_BEGIN HAL_GPIO_WritePin(ADS8688_CS_GPIO_Port, ADS8688_CS_Pin, GPIO_PIN_RESET);
-#define SAMPLE_END   HAL_GPIO_WritePin(ADS8688_CS_GPIO_Port, ADS8688_CS_Pin, GPIO_PIN_SET);
-//
 ///*!
 // *  \brief  TIM1 配置 PRC, ARR
 // *  \param  PRC 预分配系数
@@ -47,13 +43,13 @@ void ADS8688_MUL_CONFIG(u8 CH,u8 range)
 // *  \param  amp  幅度
 // *  \warn!  初始化后需要一定时间
 // */
-//void AD9959_CONFIG(float freq,float mv)
-//{
-//	//只有通道1 和 通道3可用
-//	Out_freq(2, freq);
-//	Out_mV(2, mv);
-//}
-//
+void AD9959_CONFIG(float freq,float mv)
+{
+	//只有通道1 和 通道3可用
+	Out_freq(2, freq);
+	Out_mV(2, mv);
+}
+
 ///*!
 // *  \brief  开启 TIM1 定时采样一定点数
 // *  \param  point 每个通道的采样点数
@@ -73,66 +69,66 @@ void ADS8688_SAMPLE(u16 point)
 // *  \param    CH 所选通道 (0~CH_NUL)
 // *  \detail   执行后 FFT_OUTPUT 和 FFT_OUTPUT_REAL 存下结果
 // */
-//void FFT(u8 CH)
-//{
-//	arm_rfft_fast_instance_f32 S;
-//	u16 i;
-//
-//	for(i=0;i<2048;i++)
-//	{
-//		FFT_INPUT[i] = ((float)ADS8688_BUF[CH][i] - Svar.ADS_OFFSET_ALL)*Svar.ADS_AMP/0x10000;
-//	}
-//	arm_rfft_fast_init_f32(&S,2048);                    //FFT初始化
-//	arm_rfft_fast_f32(&S, FFT_INPUT, FFT_OUTPUT,0);     //FFT变化
-//	arm_cmplx_mag_f32(FFT_OUTPUT,FFT_OUTPUT_REAL,2048); //求模
-//}
+void FFT(u8 CH)
+{
+	arm_rfft_fast_instance_f32 S;
+	u16 i;
+
+	for(i=0;i<2048;i++)
+	{
+		FFT_INPUT[i] = ((float)ADS8688_BUF[CH][i] - Svar.ADS_OFFSET_ALL)*Svar.ADS_AMP/0x10000;
+	}
+	arm_rfft_fast_init_f32(&S,2048);                    //FFT初始化
+	arm_rfft_fast_f32(&S, FFT_INPUT, FFT_OUTPUT,0);     //FFT变化
+	arm_cmplx_mag_f32(FFT_OUTPUT,FFT_OUTPUT_REAL,2048); //求模
+}
 //
 ///*!
 // *  \brief    THD 求失真度
 // *  \param    index 对应基波的频率
 // *  \detail   要先进行 FFT
 // */
-//float THD(u16 index)
-//{
-//  //基波
-//  float basic = FFT_OUTPUT_REAL[index];
-//  //谐波
-//  float harmon[5],harmon_power,high;
-//  u8 i;
-//
-//  for(i=0;i<5;i++)
-//  {
-//  	harmon[i] = FFT_OUTPUT_REAL[index*(i+2)];
-//  }
-//  arm_power_f32(harmon, 5, &harmon_power);
-//  arm_sqrt_f32(harmon_power,&high);
-//
-//  return high / basic;
-//}
+float THD(u16 index)
+{
+  //基波
+  float basic = FFT_OUTPUT_REAL[index];
+  //谐波
+  float harmon[5],harmon_power,high;
+  u8 i;
+
+  for(i=0;i<5;i++)
+  {
+  	harmon[i] = FFT_OUTPUT_REAL[index*(i+2)];
+  }
+  arm_power_f32(harmon, 5, &harmon_power);
+  arm_sqrt_f32(harmon_power,&high);
+
+  return high / basic;
+}
 //
 ///*!
 // *  \brief    FFT滤波
 // *  \param    CH 所选通道 (0~CH_NUL)
 // *  \param    point 点数
 // */
-//void FIR(u8 CH,u32 point)
-//{
-//	u32 i;
-//	arm_fir_instance_f32 S;
-//	u16 numBlocks = point/blockSize; //需要调用arm_fir_f32的次数
-//
-//	/* 初始化输入缓存 */
-//	for(i=0;i<point;i++)
-//		FIR_INPUT[i] = ((float)ADS8688_BUF[CH][i] - Svar.ADS_OFFSET_ALL)*Svar.ADS_AMP/0x10000;
-//
-//	/* 初始化结构体S */
-//	arm_fir_init_f32(&S, firCoeffsNum,(float*)firCoeffs, FIR_STATE, blockSize);
-//
-//	/* 实现FIR滤波 */
-//	for(i=0;i<numBlocks;i++)
-//		arm_fir_f32(&S, FIR_INPUT + (i * blockSize), FIR_OUTPUT + (i * blockSize), blockSize);
-//}
-//
+void FIR(u8 CH,u32 point)
+{
+	u32 i;
+	arm_fir_instance_f32 S;
+	u16 numBlocks = point/blockSize; //需要调用arm_fir_f32的次数
+
+	/* 初始化输入缓存 */
+	for(i=0;i<point;i++)
+		FIR_INPUT[i] = ((float)ADS8688_BUF[CH][i] - Svar.ADS_OFFSET_ALL)*Svar.ADS_AMP/0x10000;
+
+	/* 初始化结构体S */
+	arm_fir_init_f32(&S, firCoeffsNum,(float*)firCoeffs, FIR_STATE, blockSize);
+
+	/* 实现FIR滤波 */
+	for(i=0;i<numBlocks;i++)
+		arm_fir_f32(&S, FIR_INPUT + (i * blockSize), FIR_OUTPUT + (i * blockSize), blockSize);
+}
+
 ///*!
 // *  \brief  主任务
 // */
