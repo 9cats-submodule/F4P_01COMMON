@@ -1,7 +1,8 @@
 #include "base.h"
+#include "stdio.h"
 
 const u32 SAVE_ADDR = 0x0000f000;//FLASH´¢´æµØÖ·
-u8 STR_BUF[40]={0};
+u8 STR_BUF[200]={0};
 
 /*!
  *  \brief °´¼üÉ¨Ãèº¯Êý

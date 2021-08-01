@@ -34,6 +34,8 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 #include "base.h"
 #include "tim.h"
+#include "string.h"
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -132,6 +134,8 @@ void FaultChecK(void);
 /* USER CODE BEGIN Private defines */
 #define _CCM __attribute__((section(".ccmram")))
 #define _RAM __attribute__((section(".RamFunc")))
+extern u8 STR_BUF[200];
+#define printf(...)  HAL_UART_Transmit(&huart1, (uint8_t *)STR_BUF,sprintf((char*)STR_BUF,__VA_ARGS__), 0xFFFF);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

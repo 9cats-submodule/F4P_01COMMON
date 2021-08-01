@@ -28,7 +28,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "base.h"
 #include "data.h"
 #include "w25qxx.h"
 #include "24cxx.h"
@@ -100,9 +99,9 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_SPI1_Init();
-  MX_USART1_UART_Init();
   MX_SPI3_Init();
   MX_TIM1_Init();
+  MX_USART1_UART_Init();
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
   AT24CXX_Init();      //AT24C02-EEPROM-初始化
@@ -110,15 +109,14 @@ int main(void)
   Init_AD9959();       //AD9959-DDS    -初始化
   TFT_Init(&RxBuffer); //TFT-串口屏    -初始化
   ucHeap[0] = 0;       //显示出 ucHeap 在 CCMRAM 的占用
-  Out_freq(0, 1000);
-  Out_mV(0, 300);
-  Out_freq(1, 1000);
-  Out_mV(1, 300);
-  Out_freq(2, 1000);
-  Out_mV(2, 300);
-  Out_freq(3, 1000);
-  Out_mV(3, 300);
-
+  //Out_freq(0, 1000);
+  //Out_mV(0, 300);
+  //Out_freq(1, 1000);
+  //Out_mV(1, 300);
+  //Out_freq(2, 1000);
+  //Out_mV(2, 300);
+  //Out_freq(3, 1000);
+  //Out_mV(3, 300);
 
   /* USER CODE END 2 */
 

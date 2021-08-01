@@ -5,7 +5,7 @@
 #include "arm_math.h"
 #include "arm_const_structs.h"
 #include "fdacoefs.h"
-
+#include "stdio.h"
 ///*!
 // *  \brief  TIM1 ≈‰÷√ PRC, ARR
 // *  \param  PRC ‘§∑÷≈‰œµ ˝
@@ -141,7 +141,9 @@ void MainTask_Start(void *argument)
 	osDelay(300);
 
 	for(;;){
-		SetTextValue(1, 41, (u8*)"233");
+		static u16 num=0;
+		//SetTextValue(1, 41, (u8*)"233");
+		printf("COUNT=%d\r\n",num++);
 		osDelay(1000);
 	}
 }

@@ -104,7 +104,6 @@ void DATA_UPDATE(void);
 /*!
  *  \brief Êý×Ö×ª×Ö·û´®
  */
-extern u8 STR_BUF[40];
 #define Str(format,num) (sprintf((char*)STR_BUF,format,num),STR_BUF)
 #define vTaskDelay_ms(ms) vTaskDelay(ms / portTICK_RATE_MS);
 
