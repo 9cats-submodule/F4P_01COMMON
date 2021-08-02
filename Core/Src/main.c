@@ -35,6 +35,7 @@
 #include "portmacro.h"
 #include "hmi_user_uart.h"
 #include "AD9959.h"
+#include "DAC8563.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -113,6 +114,7 @@ int main(void)
   AT24CXX_Init();      //AT24C02-EEPROM-初始化
   W25QXX_Init();       //W25Q128-FLASH -初始化
   Init_AD9959();       //AD9959-DDS    -初始化
+  DAC8563_Init();      //DAC8563-DAC   -初始化
   TFT_Init(&RxBuffer); //TFT-串口屏    -初始化
   DATA_INIT();
   ucHeap[0] = 0;       //显示出 ucHeap 在 CCMRAM 的占用
@@ -128,9 +130,12 @@ int main(void)
   //  HAL_TIM_Base_Start_IT(&htim3);
   //  HAL_TIM_IC_Stop_IT(&htim3,	 TIM_CHANNEL_1);
   //}
-  HAL_TIM_Base_Start(&htim5);
-  HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
-  for(;;);
+  ////////////////等精度采样/////////////////////////
+//  HAL_TIM_Base_Start(&htim5);
+//  HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
+//  for(;;);
+  //////////////////////////////////////////////////
+  DAC_OutAB(2000,2000);
   /* USER CODE END 2 */
 
   /* Init scheduler */

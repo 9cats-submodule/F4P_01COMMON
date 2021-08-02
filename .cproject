@@ -53,6 +53,7 @@
 									<listOptionValue builtIn="false" value="../Drivers/AT24CXX/Inc"/>
 									<listOptionValue builtIn="false" value="../Drivers/ADS8688/Inc"/>
 									<listOptionValue builtIn="false" value="../Drivers/AD9959/Inc"/>
+									<listOptionValue builtIn="false" value="../Drivers/DAC8563/Inc"/>
 									<listOptionValue builtIn="false" value="../Drivers/TFT/Inc"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F4xx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
