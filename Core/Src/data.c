@@ -30,6 +30,8 @@ u16 blockSize = 32; //需要调用arm_fir_f32的次数
 float FIR_INPUT[SAMPLE_POINT_MAX]      ={0};
 float FIR_OUTPUT[SAMPLE_POINT_MAX]     ={0};
 float FIR_STATE[200]      ={0};
+//等距采样
+float TargetFrequency = 0;
 
 //------以下基本不用动-------
 u8 RxBuffer; //USART1接收BUF

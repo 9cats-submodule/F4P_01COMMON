@@ -37,7 +37,8 @@ extern u16   blockSize; //调用一次fir处理的采样点个数
 extern float FIR_INPUT[];
 extern float FIR_OUTPUT[];
 extern float FIR_STATE[];
-
+//等距采样
+extern float TargetFrequency;
 //------以下基本不用动-------
 extern u8 RxBuffer; //USART1接收BUF
 #endif

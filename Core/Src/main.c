@@ -60,6 +60,7 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
+static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -101,13 +102,19 @@ int main(void)
   MX_SPI1_Init();
   MX_SPI3_Init();
   MX_TIM1_Init();
+  MX_TIM3_Init();
+  MX_TIM5_Init();
   MX_USART1_UART_Init();
   MX_USART6_UART_Init();
+
+  /* Initialize interrupts */
+  MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
   AT24CXX_Init();      //AT24C02-EEPROM-初始化
-  W25QXX_Init();       //W24Q128-FLASH -初始化
+  W25QXX_Init();       //W25Q128-FLASH -初始化
   Init_AD9959();       //AD9959-DDS    -初始化
   TFT_Init(&RxBuffer); //TFT-串口屏    -初始化
+  DATA_INIT();
   ucHeap[0] = 0;       //显示出 ucHeap 在 CCMRAM 的占用
   //Out_freq(0, 1000);
   //Out_mV(0, 300);
@@ -117,7 +124,13 @@ int main(void)
   //Out_mV(2, 300);
   //Out_freq(3, 1000);
   //Out_mV(3, 300);
-
+  //{
+  //  HAL_TIM_Base_Start_IT(&htim3);
+  //  HAL_TIM_IC_Stop_IT(&htim3,	 TIM_CHANNEL_1);
+  //}
+  HAL_TIM_Base_Start(&htim5);
+  HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
+  for(;;);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -181,13 +194,43 @@ void SystemClock_Config(void)
   }
 }
 
+/**
+  * @brief NVIC Configuration.
+  * @retval None
+  */
+static void MX_NVIC_Init(void)
+{
+  /* DMA1_Stream0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+  /* DMA1_Stream5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
+  /* TIM1_UP_TIM10_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
+  /* TIM3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(TIM3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(TIM3_IRQn);
+  /* USART1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(USART1_IRQn, 6, 0);
+  HAL_NVIC_EnableIRQ(USART1_IRQn);
+  /* TIM5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(TIM5_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(TIM5_IRQn);
+  /* USART6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(USART6_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(USART6_IRQn);
+}
+
 /* USER CODE BEGIN 4 */
 
+#ifdef USE_THIS
 /* USER CODE END 4 */
 
 /**
   * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM2 interrupt took place, inside
+  * @note   This function is called  when TIM6 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
   * a global variable "uwTick" used as application time base.
   * @param  htim : TIM handle
@@ -198,11 +241,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM2) {
+  if (htim->Instance == TIM6) {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-
+#endif
+__weak void meanless(void){
   /* USER CODE END Callback 1 */
 }
 
@@ -215,6 +259,8 @@ void Error_Handler(void)
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
+  LED0_ON;
+  LED1_ON;
   while (1)
   {
   }

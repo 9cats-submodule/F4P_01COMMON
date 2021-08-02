@@ -144,6 +144,7 @@ void MainTask_Start(void *argument)
 		static u16 num=0;
 		//SetTextValue(1, 41, (u8*)"233");
 		printf("COUNT=%d\r\n",num++);
+		SetTextValue(0, 1, (u8*)"233");
 		osDelay(1000);
 	}
 }

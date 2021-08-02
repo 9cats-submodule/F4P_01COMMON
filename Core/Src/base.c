@@ -39,15 +39,15 @@ void DATA_OP(u8 mode)
 
   for(size=0;size<sizeof(SVAR);size++,VAR_ADDR++,FLASH_ADDR++)
   {
-	switch(mode)
-	{
-	  case 0:W25QXX_Write(VAR_ADDR,FLASH_ADDR,1);break;
-	  case 1:W25QXX_Read (VAR_ADDR,FLASH_ADDR,1);break;
-	  case 2:{
-	      W25QXX_Read (&data,FLASH_ADDR,1);
-		  if(data != *VAR_ADDR) W25QXX_Write(VAR_ADDR,FLASH_ADDR,1);
-	  }
-	}
+		switch(mode)
+		{
+			case 0:W25QXX_Write(VAR_ADDR,FLASH_ADDR,1);break;
+			case 1:W25QXX_Read (VAR_ADDR,FLASH_ADDR,1);break;
+			case 2:{
+					W25QXX_Read (&data,FLASH_ADDR,1);
+				if(data != *VAR_ADDR) W25QXX_Write(VAR_ADDR,FLASH_ADDR,1);
+			}
+		}
   }
 }
 
