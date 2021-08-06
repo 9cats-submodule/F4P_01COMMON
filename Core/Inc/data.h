@@ -39,6 +39,16 @@ extern float FIR_OUTPUT[];
 extern float FIR_STATE[];
 //等距采样
 extern float TargetFrequency;
+//ESP8266
+#define ESP8266_RX_MAX 1024
+extern u8  ESP8266_TX_BUF [50] ;
+extern u8  ESP8266_RX_BUF [ESP8266_RX_MAX];
+extern u8  ESP8266_ACK_BUF[10] ;
+extern u8  ESP8266_ACK_Size    ;
+extern u8  ESP8266_ACK_STA     ;
+extern u16 ESP8266_Timeout_Tick;
+extern u8  ESP8266_Response[ESP8266_RX_MAX];
+extern u8* ESP8266_Response_Ptr;
 //------以下基本不用动-------
 extern u8 RxBuffer; //USART1接收BUF
 #endif

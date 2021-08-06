@@ -7,6 +7,7 @@
 #include "ADS8688.h"
 #include "cmd_process.h"
 #include "cmd_queue.h"
+#include "esp8266.h"
 
 //-------------------ADS8688接收和发送BUF-----------------
 static u8  rxbuf [4]    = {0};
@@ -24,8 +25,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim->Instance == TIM6) HAL_IncTick(); // FreeRTOS 系统时钟
   if (htim == &htim1) TIM1_PeriodElapsedCallback();
-  if (htim == &htim5) {
-  	FreMeasure_STA=3;
+  if (htim == &htim5) FreMeasure_STA=3;
+  if (htim == &htim7) {
+  	if(ESP8266_ACK_STA == 1)
+  	{
+  		if(ESP8266_Timeout_Tick-- == 0)
+  		{
+  			ESP8266_ACK_STA=3;
+  			HAL_TIM_Base_Stop_IT(&htim7);
+  		}
+  	}
   }
 }
 
@@ -66,11 +75,22 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	{
 		huart6.RxState = HAL_UART_STATE_READY;
 		__HAL_UNLOCK(&huart6);
+		/*TFT
 		queue_push(RxBuffer);
 		if(queue_find_cmd(cmd_buffer,CMD_MAX_SIZE))
 		{
 			osMessageQueuePut(USART6_RXHandle,cmd_buffer,0,0);
 		}
+		*/
+		//
+		ESP8266_RX_PUSH(RxBuffer);
+		if(ESP8266_RX_Find(ESP8266_ACK_BUF, ESP8266_ACK_Size, ESP8266_Response_Ptr))
+			if(ESP8266_ACK_STA == 1)
+			{
+				ESP8266_ACK_STA = 2;
+				HAL_TIM_Base_Stop_IT(&htim7);
+			}
+		//
 		HAL_UART_Receive_IT(&huart6, &RxBuffer, 1);
 	}
 }

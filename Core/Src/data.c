@@ -32,9 +32,17 @@ float FIR_OUTPUT[SAMPLE_POINT_MAX]     ={0};
 float FIR_STATE[200]      ={0};
 //等距采样
 float TargetFrequency = 0;
-
+//ESP8266接收与发送
+u8  ESP8266_TX_BUF [50] = {0};
+u8  ESP8266_RX_BUF [ESP8266_RX_MAX]= {0};
+u8  ESP8266_ACK_BUF[10] = {0};
+u8  ESP8266_ACK_Size    =  0 ;
+u8  ESP8266_ACK_STA     =  0 ; // 0-未准备接收回应 1-开始接收回应 2-成功接收 3-接收超时
+u16 ESP8266_Timeout_Tick=  0 ;
+u8  ESP8266_Response[ESP8266_RX_MAX]={0};
+u8* ESP8266_Response_Ptr = NULL ;
 //------以下基本不用动-------
-u8 RxBuffer; //USART1接收BUF
+u8 RxBuffer; //USART6接收BUF
 
 // FreeRTOS 堆栈区
 _CCM u8 ucHeap[configTOTAL_HEAP_SIZE];
